@@ -1,7 +1,8 @@
 package com.veon.moveon.core.reservation
 
-import scala.concurrent.{ExecutionContext, Future}
+import com.veon.common.core.{ErrorToken, NotFoundError}
 
+import scala.concurrent.{ExecutionContext, Future}
 import com.veon.moveon.core.ReservationAlg
 import com.veon.moveon.core.movie.{Movie, MovieRepository}
 import com.veon.moveon.core.session.{Session, SessionRepository}
@@ -10,7 +11,7 @@ class ReservationService(sessionRepo: SessionRepository,
                          movieRepo: MovieRepository,
                          allocFinder: AllocationFinder)
                         (implicit val _ec: ExecutionContext)
-    extends ReservationAlg[String, Movie, Session, Any] {
+    extends ReservationAlg[String, Movie, Session] {
 
   import com.veon.common.core.Syntax._
 
@@ -27,7 +28,7 @@ class ReservationService(sessionRepo: SessionRepository,
    */
   def startSession(allocationId: String, imdbId: String, seats: Int = 0): Future[Session] = for {
     maybeMov <- movieRepo.find(imdbId)
-    mov      <- maybeMov.toFuture
+    mov      <- maybeMov.toFuture(ifFail = movieNotFound(imdbId))
     sess     <- initSession(allocationId, mov, seats)
   } yield sess
 
@@ -41,7 +42,7 @@ class ReservationService(sessionRepo: SessionRepository,
    */
   def reserveSession(allocationId: String, imdbId: String, seats: Int = 1): Future[Session] = for {
     maybeSess <- sessionRepo.find(allocationId)
-    sess      <- maybeSess.toFuture
+    sess      <- maybeSess.toFuture(ifFail = sessionNotFound(allocationId))
     if sess.movie.imdbId == imdbId
     reservedSess <- reserve(sess, seats)
   } yield reservedSess
@@ -54,7 +55,7 @@ class ReservationService(sessionRepo: SessionRepository,
    */
   def find(allocationId: String, imdbId: String): Future[Session] = for {
     maybeSess <- sessionRepo.find(allocationId)
-    session   <- maybeSess.toFuture
+    session   <- maybeSess.toFuture(ifFail = sessionNotFound(allocationId))
     if session.movie.imdbId == imdbId
   } yield session
 
@@ -72,4 +73,10 @@ class ReservationService(sessionRepo: SessionRepository,
 
   override def find(allocationId: String, movie: Movie): Future[Session] =
     find(allocationId, movie.imdbId)
+
+  private def sessionNotFound(id: String) =
+    ErrorToken(s"Session $id not found", NotFoundError)
+
+  private def movieNotFound(id: String) =
+    ErrorToken(s"Movie $id not found", NotFoundError)
 }

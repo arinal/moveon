@@ -7,19 +7,19 @@ object Syntax {
 
   implicit class FutureSyntax[M[_], A](m: M[A]) {
 
-    def toFuture: Future[A] = m match {
-      case o: Option[A] => option2Future(o)
-      case t: Try[A] => try2Future(t)
+    def toFuture(ifFail: ErrorToken = ErrorToken.empty): Future[A] = m match {
+      case o: Option[A] => option2Future(o, ifFail)
+      case t: Try[A] => try2Future(t, ifFail)
     }
 
-    def option2Future(option: Option[A]) = option match {
+    def option2Future(option: Option[A], ifFail: ErrorToken) = option match {
       case Some(s) => Future.successful(s)
-      case None => ErrorToken.future(s"$option is none")
+      case None => Future.failed(ifFail)
     }
 
-    def try2Future(tryMonad: Try[A]) = tryMonad match {
+    def try2Future(tryMonad: Try[A], ifFail: ErrorToken) = tryMonad match {
       case Success(s) => Future.successful(s)
-      case Failure(err) => Future.failed(err)
+      case Failure(err) => Future.failed(ifFail)
     }
   }
 

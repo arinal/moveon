@@ -1,6 +1,6 @@
 package com.veon.moveon.core.session
 
-import com.veon.common.core.{Entity, ErrorToken}
+import com.veon.common.core.{Entity, ErrorToken, InputError}
 import com.veon.moveon.core.movie.Movie
 
 case class Session private (
@@ -18,9 +18,9 @@ object Session {
   def validate(session: Session): Either[ErrorToken, Session] = {
     import session._
     import ErrorToken._
-    if      (initialSeats   < 0) left("initialSeats must not be negative")
-    else if (reservedSeats  < 0) left("reservedSeats must not be negative")
-    else if (availableSeats < 0) left("availableSeats must not be negative")
+    if      (initialSeats   < 0) left("initial seats must not be negative", InputError)
+    else if (reservedSeats  < 0) left("reserved seats must not be negative", InputError)
+    else if (availableSeats < 0) left("available seats must not be negative", InputError)
     else Right(session)
   }
 

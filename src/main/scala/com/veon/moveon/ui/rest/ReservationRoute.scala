@@ -5,7 +5,7 @@ import akka.http.scaladsl.model.{HttpResponse, StatusCodes}
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.{ExceptionHandler, Route}
 import akka.stream.Materializer
-import com.veon.common.core.ErrorToken
+import com.veon.common.core._
 import com.veon.moveon.core.reservation.ReservationService
 import com.veon.moveon.ui.rest.Models.{MovieSession, RegisterMovie, ReserveSeat}
 
@@ -14,16 +14,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class ReservationRoute(service: ReservationService)
                       (implicit system: ActorSystem, _mat: Materializer, _ec: ExecutionContext) {
 
-  import com.veon.common.codec.AkkaHttpCodec._
+  import com.veon.common.akkahttp.CirceCodec._
   import io.circe.generic.auto._
-
-  val errorHandler = ExceptionHandler {
-    case ErrorToken(message) =>
-      extractUri { uri =>
-        println(s"Request to $uri could not be handled normally")
-        complete(HttpResponse(StatusCodes.InternalServerError, entity = message))
-      }
-  }
 
   lazy val route: Route =
     handleExceptions(errorHandler) {
@@ -49,4 +41,19 @@ class ReservationRoute(service: ReservationService)
           }
         }
     }
+
+  private lazy val errorHandler = ExceptionHandler {
+    case ErrorToken(message, errorType) =>
+      extractUri { uri =>
+        val status = deductStatus(errorType)
+        println(s"Request to $uri could not be handled normally.\nError is: $message")
+        complete(HttpResponse(status, entity = message))
+      }
+  }
+
+  private def deductStatus(errorType: ErrorType) = errorType match {
+    case NotFoundError => StatusCodes.NotFound
+    case InputError    => StatusCodes.BadRequest
+    case ProcessError | UnknownError => StatusCodes.InternalServerError
+  }
 }

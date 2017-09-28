@@ -1,4 +1,4 @@
-package com.veon.common.codec
+package com.veon.common.akkahttp
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http

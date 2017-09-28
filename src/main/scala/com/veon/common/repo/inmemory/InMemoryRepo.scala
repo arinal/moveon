@@ -1,4 +1,4 @@
-package com.veon.common.infra.repo.inmemory
+package com.veon.common.repo.inmemory
 
 import com.veon.common.core.{Entity, Repository}
 

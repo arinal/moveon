@@ -1,4 +1,4 @@
-package com.veon.common.codec
+package com.veon.common.akkahttp
 
 import akka.http.scaladsl.marshalling.Marshaller
 import akka.http.scaladsl.model.{MediaTypes, RequestEntity}
@@ -10,7 +10,7 @@ import io.circe.{Decoder, Encoder, Json}
 import scala.concurrent.Future
 import scala.util.control.NoStackTrace
 
-object AkkaHttpCodec {
+object CirceCodec {
 
   implicit val jsonMarshaller: Marshaller[Json, RequestEntity] =
     Marshaller.StringMarshaller.wrap(MediaTypes.`application/json`)(_.noSpaces)
