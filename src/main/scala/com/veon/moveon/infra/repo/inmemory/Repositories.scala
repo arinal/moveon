@@ -4,5 +4,5 @@ import com.veon.common.infra.repo.inmemory.InMemoryRepo
 import com.veon.moveon.core.movie.{Movie, MovieRepository}
 import com.veon.moveon.core.session.{Session, SessionRepository}
 
-object MovieInMemoryRepo extends MovieRepository with InMemoryRepo[Movie, String]
-object SessionInMemoryRepo extends SessionRepository with InMemoryRepo[Session, String]
+class MovieInMemoryRepo extends MovieRepository with InMemoryRepo[Movie, String]
+class SessionInMemoryRepo extends SessionRepository with InMemoryRepo[Session, String]

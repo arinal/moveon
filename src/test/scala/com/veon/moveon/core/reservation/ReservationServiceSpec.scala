@@ -1,23 +1,22 @@
 package com.veon.moveon.core.reservation
 
-import com.veon.common.core.{Error, ForceAwait, SyncExecutionContext}
 import com.veon.moveon.core.movie.Movie
+import com.veon.moveon.infra.allocationfinder.DummyAllocationFinder
 import com.veon.moveon.infra.repo.inmemory.{MovieInMemoryRepo, SessionInMemoryRepo}
-import org.scalatest.{AsyncFlatSpec, FlatSpec, Matchers}
+import org.scalatest.{AsyncFlatSpec, Matchers}
 
-import scala.concurrent.Future
 import scala.language.postfixOps
 
 class ReservationServiceSpec extends AsyncFlatSpec
   with Matchers
   with InitializedRepoAndFinder {
 
-  val service = new ReservationService(SessionInMemoryRepo, MovieInMemoryRepo, screenFinder)
-
   "find session in empty repository" should
     "return nothing" in {
-      SessionInMemoryRepo.find("SCN1").map(_ shouldEqual None)
+      sessionRepo.find("SCN1").map(_ shouldEqual None)
     }
+
+  val service = new ReservationService(sessionRepo, movieRepo, allocFinder)
 
   "starting session" should
     "initialize session and store the sessions in repo" in {
@@ -41,7 +40,7 @@ class ReservationServiceSpec extends AsyncFlatSpec
 
   "find Jumanji session in non-empty repository" should
     "return jumanji session" in {
-      val jumanjiSess = SessionInMemoryRepo.find("SCN1")
+      val jumanjiSess = sessionRepo.find("SCN1")
       jumanjiSess.map(_.get.movie shouldEqual jumanji)
     }
 
@@ -73,19 +72,15 @@ class ReservationServiceSpec extends AsyncFlatSpec
 
 trait InitializedRepoAndFinder {
 
-  val screenFinder = new AllocationFinder {
-    override def find(id: String): Future[(String, Int)] =
-      if (id == "SCN1") Future.successful("SCN1" -> 100)
-      else if (id == "SCN2") Future.successful("SCN2" -> 50)
-      else if (id == "SCN3") Future.successful("SCN3" -> 50)
-      else Error.future("screen id not found")
-  }
+  lazy val sessionRepo = new SessionInMemoryRepo
+  lazy val movieRepo   = new MovieInMemoryRepo
+  lazy val allocFinder = new DummyAllocationFinder
 
   val jumanji = Movie("tt0113497", "Jumanji", "Joe Johnston")
   val soundOfMusic = Movie("tt0059742", "The Sound of Music", "Robert Wise")
   val fistOfLegend = Movie("tt0110200", "Fist of Legend", "Gordon Chan")
 
   Seq(jumanji, soundOfMusic, fistOfLegend)
-    .foreach(MovieInMemoryRepo.store)
+    .foreach(movieRepo.store)
 }
 

@@ -14,7 +14,7 @@ object Syntax {
 
     def option2Future(option: Option[A]) = option match {
       case Some(s) => Future.successful(s)
-      case None => Future.failed(Error(s"$option is none"))
+      case None => ErrorToken.future(s"$option is none")
     }
 
     def try2Future(tryMonad: Try[A]) = tryMonad match {
@@ -23,14 +23,14 @@ object Syntax {
     }
   }
 
-  implicit class FutureSyntax2[M[_, _], A](m: M[Error, A]) {
+  implicit class FutureSyntax2[M[_, _], A](m: M[ErrorToken, A]) {
 
     def toFuture: Future[A] = m match {
       // pretty safe to ignore this warning, m is always has type params of [Error, A]
-      case e: Either[Error, A] => either2Future(e)
+      case e: Either[ErrorToken, A] => either2Future(e)
     }
 
-    private def either2Future(either: Either[Error, A]) = either match {
+    private def either2Future(either: Either[ErrorToken, A]) = either match {
       case Right(s) => Future.successful(s)
       case Left(err) => Future.failed(err)
     }
