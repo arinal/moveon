@@ -8,5 +8,5 @@ lazy val root = (project in file(".")).
       version      := "0.1.0"
     )),
     name := "moveon",
-    libraryDependencies += scalaTest % Test
+    libraryDependencies ++= Dependencies.dependencies
   )
