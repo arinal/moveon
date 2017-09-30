@@ -13,6 +13,7 @@ abstract class InMemoryRepo[E <: Entity[Id], Id] extends Repository[E, Id] {
   override def all          = Future.successful(entityMap.values.toSeq)
   override def find(id: Id) = Future.successful(entityMap.get(id))
 
+  override def update(entity: E) = store(entity)
   override def store(entity: E) = {
     entityMap += entity.id -> entity
     Future.successful(entity)

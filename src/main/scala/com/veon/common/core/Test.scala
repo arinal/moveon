@@ -6,7 +6,7 @@ import scala.concurrent.duration._
 
 trait ForceAwait {
   implicit class AwaitSyntax[T](future: Future[T]) {
-    def await: T = Await.result(future, 1 second)
+    def await(): T = Await.result(future, 5 seconds)
   }
 }
 

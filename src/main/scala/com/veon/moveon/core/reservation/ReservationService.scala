@@ -73,9 +73,9 @@ class ReservationService(sessionRepo: SessionRepository,
   } yield storedSess
 
   override def reserve(session: Session, seats: Int = 1): Future[Session] = for {
-    sess      <- Session.reserve(session, seats).toFuture
-    savedSess <- sessionRepo.store(sess)
-  } yield savedSess
+    sess    <- Session.reserve(session, seats).toFuture
+    updated <- sessionRepo.update(sess)
+  } yield updated
 
   override def find(allocationId: String, movie: Movie): Future[(Session, Movie)] =
     find(allocationId, movie.imdbId)

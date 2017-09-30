@@ -9,6 +9,12 @@ class SessionSlickRepo(val db: Database) extends SlickRepository[Session, String
 
   override val query = TableQuery[SessionTable]
   override def filterById(id: String) = query.filter(_.screenId === id)
+
+  override def update(session: Session) = db.run {
+    query.filter(_.screenId === session.allocationId)
+      .map(m => (m.imdbId, m.initialSeats, m.reservedSeats))
+      .update((session.imdbId, session.initialSeats, session.reservedSeats))
+  }.map(_ => session)
 }
 
 class SessionTable(tag: Tag) extends Table[Session](tag, "sessions") {

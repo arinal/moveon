@@ -1,21 +1,23 @@
 package com.veon.moveon.core.reservation
 
-import com.veon.moveon.core.movie.Movie
 import com.veon.moveon.infra.allocationfinder.DummyAllocationFinder
-import com.veon.moveon.infra.repo.inmemory.{MovieInMemoryRepo, SessionInMemoryRepo}
 import org.scalatest.{AsyncFlatSpec, Matchers}
+import com.veon.moveon.tools.RepoInit
 
 import scala.language.postfixOps
 
 class ReservationServiceSpec extends AsyncFlatSpec
   with Matchers
-  with InitializedRepoAndFinder {
+  with RepoInit {
+
+  initMovies()
 
   "find session in empty repository" should
   "return nothing" in {
     sessionRepo.find("SCN1").map(_ shouldEqual None)
   }
 
+  lazy val allocFinder = new DummyAllocationFinder
   val service = new ReservationService(sessionRepo, movieRepo, allocFinder)
 
   "starting session" should
@@ -68,18 +70,4 @@ class ReservationServiceSpec extends AsyncFlatSpec
       folSess.reservedSeats shouldEqual 1
     }
   }
-}
-
-trait InitializedRepoAndFinder {
-
-  lazy val sessionRepo = new SessionInMemoryRepo
-  lazy val movieRepo   = new MovieInMemoryRepo
-  lazy val allocFinder = new DummyAllocationFinder
-
-  val jumanji = Movie("tt0113497", "Jumanji", "Joe Johnston")
-  val soundOfMusic = Movie("tt0059742", "The Sound of Music", "Robert Wise")
-  val fistOfLegend = Movie("tt0110200", "Fist of Legend", "Gordon Chan")
-
-  Seq(jumanji, soundOfMusic, fistOfLegend)
-    .foreach(movieRepo.store)
 }
