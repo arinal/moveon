@@ -26,29 +26,29 @@ class ReservationServiceSpec extends AsyncFlatSpec
       foLSess <- service.startSession("SCN3", fistOfLegend.imdbId)
     } yield (jumSess, somSess, foLSess)
 
-    multiSession.map { case (jumanjiSess, soMSess, foLSess) =>
-      jumanjiSess.movie shouldEqual jumanji
-      jumanjiSess.initialSeats shouldEqual 100
+    multiSession.map { case (jumSess, soMSess, foLSess) =>
+      jumSess.imdbId       shouldEqual jumanji.imdbId
+      jumSess.initialSeats shouldEqual 100
 
-      soMSess.movie shouldEqual soundOfMusic
+      soMSess.imdbId       shouldEqual soundOfMusic.imdbId
       soMSess.initialSeats shouldEqual 50
 
-      foLSess.movie shouldEqual fistOfLegend
+      foLSess.imdbId       shouldEqual fistOfLegend.imdbId
       foLSess.initialSeats shouldEqual 50
     }
   }
 
   "find Jumanji session in non-empty repository" should
   "return jumanji session" in {
-    val jumanjiSess = sessionRepo.find("SCN1")
-    jumanjiSess.map(_.get.movie shouldEqual jumanji)
+    val jumSess = sessionRepo.find("SCN1")
+    jumSess.map(_.get.imdbId shouldEqual jumanji.imdbId)
   }
 
   "reserving 'Fist of Legend'" should
   "update seats status" in {
     service.reserveSession("SCN3", fistOfLegend.imdbId).map { sess =>
-      sess.movie shouldEqual fistOfLegend
-      sess.reservedSeats shouldEqual 1
+      sess.imdbId         shouldEqual fistOfLegend.imdbId
+      sess.reservedSeats  shouldEqual 1
       sess.availableSeats shouldEqual (sess.initialSeats - 1)
     }
   }
@@ -56,15 +56,15 @@ class ReservationServiceSpec extends AsyncFlatSpec
   "finding 'Sound of Music' and 'Fist of Legend'" should
   "return the sessions consistenly with updated states" in {
     val sessions = for {
-      somSess <- service.find("SCN2", soundOfMusic.imdbId)
-      folSess <- service.find("SCN3", fistOfLegend.imdbId)
+      (somSess, _) <- service.find("SCN2", soundOfMusic.imdbId)
+      (folSess, _) <- service.find("SCN3", fistOfLegend.imdbId)
     } yield (somSess, folSess)
 
     sessions.map { case (somSess, folSess) =>
-      somSess.movie shouldEqual soundOfMusic
+      somSess.imdbId        shouldEqual soundOfMusic.imdbId
       somSess.reservedSeats shouldEqual 0
 
-      folSess.movie shouldEqual fistOfLegend
+      folSess.imdbId        shouldEqual fistOfLegend.imdbId
       folSess.reservedSeats shouldEqual 1
     }
   }

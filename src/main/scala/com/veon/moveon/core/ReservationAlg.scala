@@ -13,5 +13,5 @@ import scala.concurrent.Future
 trait ReservationAlg[Allocation, Movie, Session] {
   def initSession(allocation: Allocation, movie: Movie, seats: Int): Future[Session]
   def reserve(session: Session, seats: Int = 1): Future[Session]
-  def find(allocation: Allocation, movie: Movie): Future[Session]
+  def find(allocation: Allocation, movie: Movie): Future[(Session, Movie)]
 }

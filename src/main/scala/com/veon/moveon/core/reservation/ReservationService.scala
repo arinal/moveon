@@ -43,7 +43,7 @@ class ReservationService(sessionRepo: SessionRepository,
   def reserveSession(allocationId: String, imdbId: String, seats: Int = 1): Future[Session] = for {
     maybeSess <- sessionRepo.find(allocationId)
     sess      <- maybeSess.toFuture(ifFail = sessionNotFound(allocationId))
-    if sess.movie.imdbId == imdbId
+    if sess.imdbId == imdbId
     reservedSess <- reserve(sess, seats)
   } yield reservedSess
 
@@ -53,16 +53,22 @@ class ReservationService(sessionRepo: SessionRepository,
    * @param imdbId IMDb movie
    * @return the found session
    */
-  def find(allocationId: String, imdbId: String): Future[Session] = for {
-    maybeSess <- sessionRepo.find(allocationId)
-    session   <- maybeSess.toFuture(ifFail = sessionNotFound(allocationId))
-    if session.movie.imdbId == imdbId
-  } yield session
+  def find(allocationId: String, imdbId: String): Future[(Session, Movie)] = {
+    val sessFut = sessionRepo.find(allocationId)
+    val movFut  = movieRepo.find(imdbId)
+    for {
+      maybeSess <- sessFut
+      session   <- maybeSess.toFuture(ifFail = sessionNotFound(allocationId))
+      maybeMov  <- movFut
+      mov       <- maybeMov.toFuture(ifFail = movieNotFound(imdbId))
+      if session.imdbId == mov.imdbId
+    } yield (session, mov)
+  }
 
   override def initSession(allocationId: String, movie: Movie, seats: Int = 0): Future[Session] = for {
     (id, count)  <- allocFinder.find(allocationId)
     initialSeats =  if (seats == 0) count else seats
-    session      <- Session.make(id, movie, initialSeats).toFuture
+    session      <- Session.make(id, movie.imdbId, initialSeats).toFuture
     storedSess   <- sessionRepo.store(session)
   } yield storedSess
 
@@ -71,7 +77,7 @@ class ReservationService(sessionRepo: SessionRepository,
     savedSess <- sessionRepo.store(sess)
   } yield savedSess
 
-  override def find(allocationId: String, movie: Movie): Future[Session] =
+  override def find(allocationId: String, movie: Movie): Future[(Session, Movie)] =
     find(allocationId, movie.imdbId)
 
   private def sessionNotFound(id: String) =

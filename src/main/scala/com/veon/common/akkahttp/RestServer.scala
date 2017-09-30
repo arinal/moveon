@@ -23,4 +23,3 @@ class RestServer(route: Route)
     }
   }
 }
-

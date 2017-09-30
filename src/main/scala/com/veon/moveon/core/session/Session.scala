@@ -1,11 +1,10 @@
 package com.veon.moveon.core.session
 
 import com.veon.common.core.{Entity, ErrorToken, InputError}
-import com.veon.moveon.core.movie.Movie
 
-case class Session private (
+case class Session (
   allocationId : String,
-  movie        : Movie,
+  imdbId       : String,
   initialSeats : Int,
   reservedSeats: Int) extends Entity[String] {
 
@@ -24,13 +23,18 @@ object Session {
     else Right(session)
   }
 
-  def make(allocationId: String, movie: Movie, initialSeats: Int): Either[ErrorToken, Session] = {
-    val newSession = Session(allocationId, movie, initialSeats, 0)
+  def make(allocationId: String, movieId: String, initialSeats: Int): Either[ErrorToken, Session] = {
+    val newSession = Session(allocationId, movieId, initialSeats, 0)
     validate(newSession)
   }
 
   def reserve(session: Session, seats: Int): Either[ErrorToken, Session] = {
     val reservedSess = session.copy(reservedSeats = session.reservedSeats + seats)
     validate(reservedSess)
+  }
+
+  def tupled(tuple: (String, String, Int, Int)) = {
+    val (id, movId, max, res) = tuple
+    Session(id, movId, max, res)
   }
 }
