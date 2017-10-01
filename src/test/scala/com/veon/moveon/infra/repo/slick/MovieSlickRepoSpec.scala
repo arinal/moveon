@@ -10,10 +10,11 @@ class MovieSlickRepoSpec extends AsyncFlatSpec
     with RepoInit
     with ForceAwait {
 
-  import slick.jdbc.H2Profile.api._
-
-  lazy val db = Database.forConfig("damn")
-  override lazy val movieRepo = new MovieSlickRepo(db)
+  override lazy val movieRepo = new MovieSlickRepo {
+    override lazy val profile = slick.jdbc.H2Profile
+    import slick.jdbc.H2Profile.api._
+    override lazy val db = Database.forConfig("damn")
+  }
 
   movieRepo.mkTable()
 
