@@ -25,6 +25,7 @@ trait Injection {
 
   lazy val sessionRepo = new SessionSlickRepo with Slick
   lazy val movieRepo   = new MovieSlickRepo with Slick
+
   lazy val allocFinder = wire[DummyAllocationFinder]
   lazy val service     = wire[ReservationService]
 

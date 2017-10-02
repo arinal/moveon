@@ -7,13 +7,12 @@ import org.scalatest.{AsyncFlatSpec, Matchers}
 
 class MovieSlickRepoSpec extends AsyncFlatSpec
     with Matchers
-    with RepoInit
-    with ForceAwait {
+    with RepoInit {
 
   override lazy val movieRepo = new MovieSlickRepo {
     override lazy val profile = slick.jdbc.H2Profile
     import slick.jdbc.H2Profile.api._
-    override lazy val db = Database.forConfig("damn")
+    override lazy val db = Database.forConfig("db-unittest")
   }
 
   movieRepo.mkTable()

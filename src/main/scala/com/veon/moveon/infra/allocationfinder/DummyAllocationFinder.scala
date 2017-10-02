@@ -13,4 +13,3 @@ class DummyAllocationFinder extends AllocationFinder {
     else if (id == "SCN3") Future.successful("SCN3" -> 50)
     else ErrorToken.future("screen id not found", NotFoundError)
 }
-
