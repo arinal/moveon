@@ -1,4 +1,4 @@
-package com.veon.moveon.ui.rest
+package com.veon.moveon.app.rest
 
 import akka.http.scaladsl.server.ExceptionHandler
 import akka.http.scaladsl.model.{HttpResponse, StatusCodes}

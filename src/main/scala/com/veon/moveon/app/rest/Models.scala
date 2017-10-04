@@ -1,4 +1,4 @@
-package com.veon.moveon.ui.rest
+package com.veon.moveon.app.rest
 
 import com.veon.moveon.core.movie.Movie
 import com.veon.moveon.core.session.Session

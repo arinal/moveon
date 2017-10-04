@@ -1,11 +1,11 @@
-package com.veon.moveon.ui.rest
+package com.veon.moveon.app.rest
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.stream.Materializer
 import com.veon.moveon.core.reservation.ReservationService
-import com.veon.moveon.ui.rest.Models.{RegisterMovie, ReserveSeat}
+import com.veon.moveon.app.rest.Models.{RegisterMovie, ReserveSeat}
 
 import scala.concurrent.ExecutionContext
 
@@ -33,7 +33,9 @@ class ReservationRoute(service: ReservationService)
         }
       } ~
       (get & parameter('screenId) & parameter('imdbId)) { (scrId, imdbId) =>
-        complete(service.find(scrId, imdbId).map(Models.fromSession))
+        complete {
+          service.find(scrId, imdbId).map(Models.fromSession)
+        }
       }
     }
   }
