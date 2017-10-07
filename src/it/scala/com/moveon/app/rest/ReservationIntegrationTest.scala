@@ -25,18 +25,19 @@ class ReservationIntegrationTest extends AsyncFlatSpec
 
     val register = RegisterMovie("tt0113497", 2, "SCN1")
     val reserve = ReserveSeat(register.imdbId, register.screenId)
+    val (regJson, rsvpJson) = (register.asJson.noSpaces, reserve.asJson.noSpaces)
 
     val result = for {
-      _     <- httpPost(s"$baseUrl/register", register.asJson.noSpaces)
+      _     <- httpPost(s"$baseUrl/register", regJson)
       sess1 <- httpCallAndDecode[MovieSession](s"$baseUrl?screenId=SCN1&imdbId=tt0113497")
 
-      _     <- httpPost(s"$baseUrl/reserve", reserve.asJson.noSpaces)
+      _     <- httpPost(s"$baseUrl/reserve", rsvpJson)
       sess2 <- httpCallAndDecode[MovieSession](s"$baseUrl?screenId=SCN1&imdbId=tt0113497")
 
-      _     <- httpPost(s"$baseUrl/reserve", reserve.asJson.noSpaces)
+      _     <- httpPost(s"$baseUrl/reserve", rsvpJson)
       sess3 <- httpCallAndDecode[MovieSession](s"$baseUrl?screenId=SCN1&imdbId=tt0113497")
 
-      resp  <- httpPost(s"$baseUrl/reserve", reserve.asJson.noSpaces)
+      resp  <- httpPost(s"$baseUrl/reserve", rsvpJson)
     } yield (sess1, sess2, sess3, resp)
 
     result.map { case (sess1, sess2, sess3, resp) =>

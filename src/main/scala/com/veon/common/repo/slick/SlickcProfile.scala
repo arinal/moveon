@@ -1,4 +1,4 @@
-package com.veon.moveon.infra.repo.slick
+package com.veon.common.repo.slick
 
 import slick.jdbc.JdbcProfile
 

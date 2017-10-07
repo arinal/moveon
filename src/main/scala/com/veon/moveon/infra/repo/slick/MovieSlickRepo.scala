@@ -1,9 +1,10 @@
 package com.veon.moveon.infra.repo.slick
 
 import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException
-import com.veon.moveon.core.movie.{Movie, MovieRepository}
 import org.h2.jdbc.JdbcSQLException
 import scala.concurrent.Future
+import com.veon.common.repo.slick.SlickProfile
+import com.veon.moveon.core.movie.{Movie, MovieRepository}
 
 trait MovieSlickRepo extends MovieRepository
     with SlickProfile
@@ -28,6 +29,9 @@ trait MovieSlickRepo extends MovieRepository
       .map(_ => movie)
       .recoverWith {
         case ex: JdbcSQLException
+            if ex.getMessage.contains("Unique index or primary key") =>
+          Future.failed(alreadyExistsError(movie))
+        case ex: MySQLIntegrityConstraintViolationException
             if ex.getMessage.contains("Unique index or primary key") =>
           Future.failed(alreadyExistsError(movie))
       }

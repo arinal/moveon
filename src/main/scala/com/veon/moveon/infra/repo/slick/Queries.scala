@@ -1,5 +1,6 @@
 package com.veon.moveon.infra.repo.slick
 
+import com.veon.common.repo.slick.SlickProfile
 import com.veon.moveon.core.session.{ Session => MovieSession }
 import com.veon.moveon.core.movie.{ Movie }
 

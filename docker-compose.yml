@@ -9,7 +9,14 @@ services:
     ports:
       - 3306:3306
     volumes:
-      - "./scripts:/docker-entrypoint-initdb.d"
+      - "./scripts/db:/docker-entrypoint-initdb.d"
+
+  wiremock:
+    image: "rodolpheche/wiremock"
+    ports:
+      - 9080:8080
+    volumes:
+      - "./scripts/wiremock:/home/wiremock/mappings"
 
   moveon:    
     image: "veon/moveon:latest"
@@ -17,5 +24,7 @@ services:
       - MOVEON_DB_HOST=mysql
       - MOVEON_DB_USER=root
       - MOVEON_DB_PASS=rootp
+      - MOVEON_ALLOC_HOST=wiremock
+      - MOVEON_ALLOC_PORT=8080
     ports:
       - 8080:8080

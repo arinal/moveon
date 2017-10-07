@@ -2,16 +2,17 @@ package com.veon.moveon.app.rest.injection
 
 import com.softwaremill.macwire.wire
 import com.typesafe.config.Config
+import com.veon.common.repo.slick.SlickProfile
 import com.veon.moveon.infra.repo.inmemory._
-import com.veon.moveon.infra.repo.slick.{MovieSlickRepo, SessionSlickRepo, SlickProfile}
+import com.veon.moveon.infra.repo.slick.{MovieSlickRepo, SessionSlickRepo}
 import com.veon.moveon.core.movie.Movie
 
-class MySqlRepoModule(implicit config: Config) {
+class MySqlRepoModule {
 
   trait Slick extends SlickProfile {
     override lazy val profile = slick.jdbc.MySQLProfile
     import slick.jdbc.MySQLProfile.api._
-    override lazy val db = Database.forConfig(config.getString("db.section"))
+    override lazy val db = Database.forConfig(Config.dbSection)
   }
 
   lazy val sessionRepo = new SessionSlickRepo with Slick

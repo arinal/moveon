@@ -15,9 +15,14 @@ import io.circe.parser.decode
 import scala.collection.immutable.Seq
 import scala.concurrent.{ExecutionContext, Future}
 
+object AkkaHttpClient {
+  case class ResponseError(response: HttpResponse) extends Throwable
+}
+
 trait AkkaHttpClient {
 
   type CommonFlow = Flow[HttpRequest, HttpResponse, Future[OutgoingConnection]]
+  import AkkaHttpClient._
 
   def httpPost(uri: String, body: String, headers: Seq[HttpHeader] = Nil)
                  (implicit as: ActorSystem, mat: Materializer) = {
@@ -36,6 +41,9 @@ trait AkkaHttpClient {
               (implicit as: ActorSystem, mat: Materializer, ec: ExecutionContext, dec: Decoder[A]) =
     for {
       resp <- Http().singleRequest(request)
+      _    <- if (resp.status.intValue >= 300) Future.failed(ResponseError(resp))
+              else Future.successful(resp)
+
       rawData = resp.entity.dataBytes.runFold(ByteString.empty)(_ ++ _)
       encoding = resp.getHeader("Content-Encoding")
       data <- if (encoding.isPresent && encoding.get.value == HttpEncodings.gzip.value) rawData.flatMap(Gzip.decode)
