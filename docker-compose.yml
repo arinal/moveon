@@ -1,11 +1,21 @@
 version: '2'
 
 services:
+
   mysql:
     image: mysql:latest
     environment:
-      - MYSQL_ROOT_PASSWORD=dockerp
+      - MYSQL_ROOT_PASSWORD=rootp
     ports:
       - 3306:3306
     volumes:
       - "./scripts:/docker-entrypoint-initdb.d"
+
+  moveon:    
+    image: "veon/moveon:latest"
+    environment:
+      - MOVEON_DB_HOST=mysql
+      - MOVEON_DB_USER=root
+      - MOVEON_DB_PASS=rootp
+    ports:
+      - 8080:8080

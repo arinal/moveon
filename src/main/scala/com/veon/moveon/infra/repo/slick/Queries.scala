@@ -24,8 +24,8 @@ trait Queries extends SlickProfile {
     def countAct = size.result
     def allAct   = this.result
     def findAct(screenId: String) = find(screenId).result.head
-    def updateAct(session: MovieSession) = find(session.imdbId)
-      .map(m => (m.imdbId,m.initialSeats, m.reservedSeats))
+    def updateAct(session: MovieSession) = find(session.allocationId)
+      .map(m => (m.imdbId, m.initialSeats, m.reservedSeats))
       .update((session.imdbId, session.initialSeats, session.reservedSeats))
 
     def find(screenId: String)    = filter(_.screenId === screenId)

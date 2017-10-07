@@ -1,10 +1,10 @@
 package com.veon.moveon.core.reservation
 
-import com.veon.moveon.infra.allocationfinder.DummyAllocationFinder
-import org.scalatest.{AsyncFlatSpec, Matchers}
-import com.veon.moveon.tools.RepoInit
-
 import scala.language.postfixOps
+
+import com.veon.moveon.infra.allocationfinder.DummyAllocationFinder
+import com.veon.moveon.tools.RepoInit
+import org.scalatest.{AsyncFlatSpec, Matchers}
 
 class ReservationServiceSpec extends AsyncFlatSpec
   with Matchers
@@ -17,7 +17,7 @@ class ReservationServiceSpec extends AsyncFlatSpec
     sessionRepo.find("SCN1").map(_ shouldEqual None)
   }
 
-  lazy val allocFinder = new DummyAllocationFinder
+  val allocFinder = new DummyAllocationFinder
   val service = new ReservationService(sessionRepo, movieRepo, allocFinder)
 
   "starting session" should

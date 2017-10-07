@@ -1,6 +1,5 @@
 package com.veon.moveon.core.reservation
 
-import com.veon.common.core.ForceAwait
 import com.veon.moveon.infra.repo.slick.MovieSlickRepo
 import com.veon.moveon.tools.RepoInit
 import org.scalatest.{AsyncFlatSpec, Matchers}
@@ -12,7 +11,7 @@ class MovieSlickRepoSpec extends AsyncFlatSpec
   override lazy val movieRepo = new MovieSlickRepo {
     override lazy val profile = slick.jdbc.H2Profile
     import slick.jdbc.H2Profile.api._
-    override lazy val db = Database.forConfig("db-unittest")
+    override lazy val db = Database.forConfig("db-unittest-moveon")
   }
 
   movieRepo.mkTable()

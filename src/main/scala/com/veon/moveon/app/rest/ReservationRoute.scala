@@ -32,9 +32,11 @@ class ReservationRoute(service: ReservationService)
           }
         }
       } ~
-      (get & parameter('screenId) & parameter('imdbId)) { (scrId, imdbId) =>
-        complete {
-          service.find(scrId, imdbId).map(Models.fromSession)
+      get {
+        (parameter('screenId) & parameter('imdbId)) { (scrId, imdbId) =>
+          complete {
+            service.find(scrId, imdbId).map(Models.fromSession)
+          }
         }
       }
     }

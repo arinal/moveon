@@ -13,7 +13,7 @@ class RestServer(route: Route)
 
   def start(port: Int = 8080): Future[ServerBinding] = {
     println(s"Server is started on port $port")
-    Http().bindAndHandle(route, "localhost", port)
+    Http().bindAndHandle(route, "0.0.0.0", port)
   }
 
   def stop(bindingFut: Future[ServerBinding]): Unit = {
