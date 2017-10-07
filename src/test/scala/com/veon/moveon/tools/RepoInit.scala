@@ -17,5 +17,5 @@ trait RepoInit {
   val allMovies = Seq(jumanji, soundOfMusic, fistOfLegend)
 
   def initMovies()(implicit ec: ExecutionContext) =
-    Future.traverse(allMovies)(movieRepo.store)
+    Future.traverse(allMovies)(movieRepo.insert)
 }

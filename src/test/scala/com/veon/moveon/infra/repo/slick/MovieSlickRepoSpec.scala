@@ -43,7 +43,7 @@ class MovieSlickRepoSpec extends AsyncFlatSpec
   "inserting SoM again" should
   "return already exists error" in {
     recoverToSucceededIf[ErrorToken] {
-      movieRepo.store(soundOfMusic)
+      movieRepo.insert(soundOfMusic)
     }
   }
 }

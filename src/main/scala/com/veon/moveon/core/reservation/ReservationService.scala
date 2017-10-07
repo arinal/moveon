@@ -69,7 +69,7 @@ class ReservationService(sessionRepo: SessionRepository,
     (id, count)  <- allocFinder.find(allocationId)
     initialSeats =  if (seats == 0) count else seats
     session      <- Session.make(id, movie.imdbId, initialSeats).toFuture
-    storedSess   <- sessionRepo.store(session)
+    storedSess   <- sessionRepo.insert(session)
   } yield storedSess
 
   override def reserve(session: Session, seats: Int = 1): Future[Session] = for {

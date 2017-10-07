@@ -35,16 +35,16 @@ trait AkkaHttpClient {
 
   def httpCallAndDecode[A](uri: String, headers: Seq[HttpHeader] = Nil)
                  (implicit as: ActorSystem, mat: Materializer, ec: ExecutionContext, dec: Decoder[A]): Future[A] =
-    httpInvokeAndDecode[A](HttpRequest(uri = uri, headers = headers))
+    httpCallAndDecode[A](HttpRequest(uri = uri, headers = headers))
 
-  def httpInvokeAndDecode[A](request: HttpRequest)
+  def httpCallAndDecode[A](request: HttpRequest)
               (implicit as: ActorSystem, mat: Materializer, ec: ExecutionContext, dec: Decoder[A]) =
     for {
       resp <- Http().singleRequest(request)
       _    <- if (resp.status.intValue >= 300) Future.failed(ResponseError(resp))
               else Future.successful(resp)
 
-      rawData = resp.entity.dataBytes.runFold(ByteString.empty)(_ ++ _)
+      rawData  = resp.entity.dataBytes.runFold(ByteString.empty)(_ ++ _)
       encoding = resp.getHeader("Content-Encoding")
       data <- if (encoding.isPresent && encoding.get.value == HttpEncodings.gzip.value) rawData.flatMap(Gzip.decode)
               else rawData

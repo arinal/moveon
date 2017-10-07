@@ -12,6 +12,6 @@ trait Repository[E <: Entity[_], Id] {
   def find(id: Id): Future[Option[E]]
   def all: Future[Seq[E]]
 
-  def store(entity: E): Future[E]
+  def insert(entity: E): Future[E]
   def update(entity: E): Future[E]
 }

@@ -24,7 +24,7 @@ trait MovieSlickRepo extends MovieRepository
         case _: NoSuchElementException => None
       }
 
-  override def store(movie: Movie) =
+  override def insert(movie: Movie) =
     db.run(movieQuery += movie)
       .map(_ => movie)
       .recoverWith {

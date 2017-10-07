@@ -1,0 +1,13 @@
+{
+    "request": {
+        "method": "GET",
+        "url": "/api/screen/SCN3"
+    },
+    "response": {
+        "status": 200,
+        "jsonBody": {
+            "screen_id": "SCN3",
+            "capacity" : "50"
+        }
+    }
+}

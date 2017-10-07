@@ -1,7 +1,6 @@
 package com.veon.moveon.app.rest.injection
 
 import com.softwaremill.macwire.wire
-import com.typesafe.config.Config
 import com.veon.common.repo.slick.SlickProfile
 import com.veon.moveon.infra.repo.inmemory._
 import com.veon.moveon.infra.repo.slick.{MovieSlickRepo, SessionSlickRepo}
@@ -36,7 +35,7 @@ class H2RepoModule {
   Seq(Movie("tt0113497", "Jumanji", "Joe Johnston"),
       Movie("tt0059742", "The Sound of Music", "Robert Wise"),
       Movie("tt0110200", "Fist of Legend", "Gordon Chan"))
-    .foreach(movieRepo.store)
+    .foreach(movieRepo.insert)
 }
 
 class InMemoryRepoModule {
@@ -46,5 +45,5 @@ class InMemoryRepoModule {
   Seq(Movie("tt0113497", "Jumanji", "Joe Johnston"),
       Movie("tt0059742", "The Sound of Music", "Robert Wise"),
       Movie("tt0110200", "Fist of Legend", "Gordon Chan"))
-    .foreach(movieRepo.store)
+    .foreach(movieRepo.insert)
 }

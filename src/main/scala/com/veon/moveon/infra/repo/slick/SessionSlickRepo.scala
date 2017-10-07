@@ -24,7 +24,7 @@ trait SessionSlickRepo extends SessionRepository
         case _: NoSuchElementException => None
       }
 
-  override def store(session: MovieSession) =
+  override def insert(session: MovieSession) =
     db.run(sessionQuery += session)
       .map(_ => session)
       .recoverWith {
