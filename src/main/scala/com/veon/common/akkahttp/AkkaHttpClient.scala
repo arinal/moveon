@@ -19,20 +19,20 @@ trait AkkaHttpClient {
 
   type CommonFlow = Flow[HttpRequest, HttpResponse, Future[OutgoingConnection]]
 
-  def httpPostCall[A](uri: String, body: String, headers: Seq[HttpHeader] = Nil)
-                 (implicit as: ActorSystem, mat: Materializer, ec: ExecutionContext, dec: Decoder[A]): Future[A] = {
+  def httpPost(uri: String, body: String, headers: Seq[HttpHeader] = Nil)
+                 (implicit as: ActorSystem, mat: Materializer) = {
     val request = HttpRequest(uri = uri,
       method = HttpMethods.POST,
       headers = headers,
       entity = HttpEntity(body))
-    httpCall[A](request)
+    Http().singleRequest(request)
   }
 
-  def httpCall[A](uri: String, headers: Seq[HttpHeader] = Nil)
+  def httpCallAndDecode[A](uri: String, headers: Seq[HttpHeader] = Nil)
                  (implicit as: ActorSystem, mat: Materializer, ec: ExecutionContext, dec: Decoder[A]): Future[A] =
-    httpCall[A](HttpRequest(uri = uri, headers = headers))
+    httpInvokeAndDecode[A](HttpRequest(uri = uri, headers = headers))
 
-  def httpCall[A](request: HttpRequest)
+  def httpInvokeAndDecode[A](request: HttpRequest)
               (implicit as: ActorSystem, mat: Materializer, ec: ExecutionContext, dec: Decoder[A]) =
     for {
       resp <- Http().singleRequest(request)

@@ -1,5 +1,6 @@
 package com.veon.moveon.core.reservation
 
+import com.veon.common.core.ErrorToken
 import com.veon.moveon.infra.repo.slick.MovieSlickRepo
 import com.veon.moveon.tools.RepoInit
 import org.scalatest.{AsyncFlatSpec, Matchers}
@@ -12,9 +13,9 @@ class MovieSlickRepoSpec extends AsyncFlatSpec
     override lazy val profile = slick.jdbc.H2Profile
     import slick.jdbc.H2Profile.api._
     override lazy val db = Database.forConfig("db-unittest-moveon")
-  }
 
-  movieRepo.mkTable()
+    mkTable()
+  }
 
   "find session in empty repository" should
   "return nothing" in {
@@ -37,5 +38,12 @@ class MovieSlickRepoSpec extends AsyncFlatSpec
     movieRepo.update(changed)
     movieRepo.find(soundOfMusic.imdbId)
       .map(_ shouldEqual Some(changed))
+  }
+
+  "inserting SoM again" should
+  "return already exists error" in {
+    recoverToSucceededIf[ErrorToken] {
+      movieRepo.store(soundOfMusic)
+    }
   }
 }

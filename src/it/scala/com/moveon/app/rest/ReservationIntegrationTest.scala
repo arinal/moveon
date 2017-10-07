@@ -3,12 +3,16 @@ package com.veon.moveon.app.rest
 import akka.actor.ActorSystem
 import akka.stream.{ActorMaterializer, Materializer}
 import com.veon.common.akkahttp.AkkaHttpClient
-import com.veon.moveon.core.movie.Movie
+import com.veon.moveon.app.rest.Models.{MovieSession, RegisterMovie, ReserveSeat}
 import org.scalatest.{AsyncFlatSpec, Matchers}
 
 class ReservationIntegrationTest extends AsyncFlatSpec
     with Matchers
     with AkkaHttpClient {
+
+  import io.circe.syntax._
+  import io.circe.generic.auto._
+  import akka.http.scaladsl.model.StatusCodes._
 
   implicit val _sys = ActorSystem("integration-test")
   implicit val _ec = _sys.dispatcher
@@ -19,22 +23,30 @@ class ReservationIntegrationTest extends AsyncFlatSpec
   "Doing reservation in happy path manner" should
   "behave accordingly" in {
 
-    val jumanji = Movie("tt0113497", "Jumanji", "Joe Johnston")
-    val screenId = "SCN1"
-    val initialSeats = 10
-    val registerJson = s"""{
-        |"imdbId": "${jumanji.imdbId}",
-        |"screenId": "$screenId",
-        |"availableSeats": $initialSeats
-      |}""".stripMargin
+    val register = RegisterMovie("tt0113497", 2, "SCN1")
+    val reserve = ReserveSeat(register.imdbId, register.screenId)
 
-    println(registerJson)
+    val result = for {
+      _     <- httpPost(s"$baseUrl/register", register.asJson.noSpaces)
+      sess1 <- httpCallAndDecode[MovieSession](s"$baseUrl?screenId=SCN1&imdbId=tt0113497")
 
-    val f = for {
-      _   <- httpPostCall[String](s"$baseUrl/register", registerJson)
-      res <- httpCall[String](s"$baseUrl?screenId=SCN1&imdbId=tt0113497")
-    } yield res
+      _     <- httpPost(s"$baseUrl/reserve", reserve.asJson.noSpaces)
+      sess2 <- httpCallAndDecode[MovieSession](s"$baseUrl?screenId=SCN1&imdbId=tt0113497")
 
-    f.map(_ shouldEqual 5)
+      _     <- httpPost(s"$baseUrl/reserve", reserve.asJson.noSpaces)
+      sess3 <- httpCallAndDecode[MovieSession](s"$baseUrl?screenId=SCN1&imdbId=tt0113497")
+
+      resp  <- httpPost(s"$baseUrl/reserve", reserve.asJson.noSpaces)
+    } yield (sess1, sess2, sess3, resp)
+
+    result.map { case (sess1, sess2, sess3, resp) =>
+      sess1.movieTitle     shouldEqual "Jumanji"
+
+      sess1.availableSeats shouldEqual 2
+      sess2.availableSeats shouldEqual 1
+      sess3.availableSeats shouldEqual 0
+
+      resp.status shouldEqual BadRequest
+    }
   }
 }

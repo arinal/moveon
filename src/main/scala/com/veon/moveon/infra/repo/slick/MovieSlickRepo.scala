@@ -1,6 +1,9 @@
 package com.veon.moveon.infra.repo.slick
 
+import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException
 import com.veon.moveon.core.movie.{Movie, MovieRepository}
+import org.h2.jdbc.JdbcSQLException
+import scala.concurrent.Future
 
 trait MovieSlickRepo extends MovieRepository
     with SlickProfile
@@ -20,9 +23,14 @@ trait MovieSlickRepo extends MovieRepository
         case _: NoSuchElementException => None
       }
 
-  override def store(movie: Movie) = db.run {
-    movieQuery += movie
-  }.map(_ => movie)
+  override def store(movie: Movie) =
+    db.run(movieQuery += movie)
+      .map(_ => movie)
+      .recoverWith {
+        case ex: JdbcSQLException
+            if ex.getMessage.contains("Unique index or primary key") =>
+          Future.failed(alreadyExistsError(movie))
+      }
 
   override def update(movie: Movie) = db.run {
     movieQuery.updateAct(movie)

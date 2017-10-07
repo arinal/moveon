@@ -1,6 +1,8 @@
 package com.veon.moveon.infra.repo.slick
 
+import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException
 import com.veon.moveon.core.session.{ Session => MovieSession, SessionRepository }
+import scala.concurrent.Future
 
 trait SessionSlickRepo extends SessionRepository
     with SlickProfile
@@ -20,9 +22,13 @@ trait SessionSlickRepo extends SessionRepository
         case _: NoSuchElementException => None
       }
 
-  override def store(session: MovieSession) = db.run {
-    sessionQuery += session
-  }.map(_ => session)
+  override def store(session: MovieSession) =
+    db.run(sessionQuery += session)
+      .map(_ => session)
+      .recoverWith {
+        case _: MySQLIntegrityConstraintViolationException =>
+          Future.failed(alreadyExistsError(session))
+      }
 
   override def update(session: MovieSession) = db.run {
     sessionQuery.updateAct(session)
