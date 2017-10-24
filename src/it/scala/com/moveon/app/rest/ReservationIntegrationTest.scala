@@ -1,9 +1,9 @@
-package com.veon.moveon.app.rest
+package com.lamedh.moveon.app.rest
 
 import akka.actor.ActorSystem
 import akka.stream.{ActorMaterializer, Materializer}
-import com.veon.common.akkahttp.AkkaHttpClient
-import com.veon.moveon.app.rest.Models.{MovieSession, RegisterMovie, ReserveSeat}
+import com.lamedh.common.akkahttp.AkkaHttpClient
+import com.lamedh.moveon.app.rest.Models.{MovieSession, RegisterMovie, ReserveSeat}
 import org.scalatest.{AsyncFlatSpec, Matchers}
 
 class ReservationIntegrationTest extends AsyncFlatSpec
