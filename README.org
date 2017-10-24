@@ -1,0 +1,35 @@
+#+TITLE: Simple Functional Domain Driven Example
+A Scala implementation for creating RESTful apps with functional programming and DDD mindset.
+Its simplicity is ideal for anyone who self-learn scala and DDD.
+
+** Moveon
+Application for making movie seat reservation. The domain is simple and completely described in one single algebra.
+
+#+begin_src scala
+trait ReservationAlg[Allocation, Movie, Session] {
+  def initSession(allocation: Allocation, movie: Movie, seats: Int): Future[Session]
+  def reserve(session: Session, seats: Int = 1): Future[Session]
+  def find(allocation: Allocation, movie: Movie): Future[(Session, Movie)]
+}
+#+end_src
+
+** Getting started
+  Go to the root directory of this project.
+  Execute =docker-compose up= to start moveon server, mysql and external mock server.
+  Fire up =sbt= and use these commands:
+  #+begin_src bash
+  test     # starting unit test
+  it:test  # starting integration test, make sure to fire up 'docker-compose up' first
+  #+end_src
+
+** Main technology stack
+1. [[https://akka.io/docs/][akka-http]] for both http client and server
+2. [[https://circe.github.io/circe/][circe]] for encoding and decoding Json
+3. [[https://github.com/adamw/macwire][macwire]] for dependency injection
+4. [[http://slick.lightbend.com/][slick]] for accessing database
+5. [[http://www.scala-lang.org/][scala]] for language and standard libraries
+6. [[https://www.docker.com/][docker]] for containerization and server dependencies
+7. [[https://www.mysql.com/][mysql]] for, well, mysql
+8. [[http://wiremock.org/][wiremock]] for mock http server
+
+Unfortunately, no =scalaz= or =cats=, all the monads is implemented using plain, simple and happy scala libraries :)
