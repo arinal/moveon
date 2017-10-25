@@ -23,7 +23,7 @@ class ReservationIntegrationTest extends AsyncFlatSpec
   "Doing reservation in happy path manner" should
   "behave accordingly" in {
 
-    val register = RegisterMovie("tt0113497", 2, "SCN1")
+    val register = RegisterMovie("tt0113497", "SCN1", 2)
     val reserve = ReserveSeat(register.imdbId, register.screenId)
     val (regJson, rsvpJson) = (register.asJson.noSpaces, reserve.asJson.noSpaces)
 

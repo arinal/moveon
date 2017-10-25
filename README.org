@@ -3,33 +3,93 @@ A Scala implementation for creating RESTful apps with functional programming and
 Its simplicity is ideal for anyone who self-learn scala and DDD.
 
 ** Moveon
-Application for making movie seat reservation. The domain is simple and completely described in one single algebra.
+   Application for making movie seat reservation. The domain is simple and completely described in one single algebra.
 
-#+begin_src scala
-trait ReservationAlg[Allocation, Movie, Session] {
-  def initSession(allocation: Allocation, movie: Movie, seats: Int): Future[Session]
-  def reserve(session: Session, seats: Int = 1): Future[Session]
-  def find(allocation: Allocation, movie: Movie): Future[(Session, Movie)]
-}
-#+end_src
+   #+begin_src scala
+   trait ReservationAlg[Allocation, Movie, Session] {
+     def initSession(allocation: Allocation, movie: Movie, seats: Int): Future[Session]
+     def reserve(session: Session, seats: Int = 1): Future[Session]
+     def find(allocation: Allocation, movie: Movie): Future[(Session, Movie)]
+   }
+   #+end_src
 
 ** Getting started
-  Go to the root directory of this project.
-  Execute =docker-compose up= to start moveon server, mysql and external mock server.
-  Fire up =sbt= and use these commands:
-  #+begin_src bash
-  test     # starting unit test
-  it:test  # starting integration test, make sure to fire up 'docker-compose up' first
-  #+end_src
+   Go to the root directory of this project.
+   Execute =docker-compose up= to start moveon server, mysql and external mock server.
+   Fire up =sbt= and use these commands:
+   #+begin_src bash
+   test     # starting unit test
+   it:test  # starting integration test, make sure to fire up 'docker-compose up' first
+   run      # starting moveon server, not necessary if you fired 'docker-compose up'
+   #+end_src
+
+   Please note that running integration test more than once will trigger an error, since the state is not restarted.
+   You can manually call the endpoints using any http client, this example is using [[https://httpie.org/][httpie]].
+
+   Register 'SCN2' allocation to 'Sound of Music' with starting seats of 2.
+   #+begin_src bash
+  http -v :8080/movies/register screenId=SCN2 imdbId=tt0059742 availableSeats=2
+
+  POST /movies/register HTTP/1.1
+  User-Agent: HTTPie/0.9.9
+  Accept-Encoding: gzip, deflate
+  Accept: application/json, */*
+  Connection: keep-alive
+  Content-Type: application/json
+  Content-Length: 66
+  Host: localhost:8080
+
+  {"screenId": "SCN2", "imdbId": "tt0059742", "availableSeats": "2"}
+
+  HTTP/1.1 200 OK
+  Server: akka-http/10.0.10
+  Date: Wed, 25 Oct 2017 01:06:43 GMT
+  Content-Type: application/json
+  Content-Length: 11
+
+  "tt0059742"
+   #+end_src
+   By adding =-v= to =httpie=, the request will be displayed in details.
+
+   After it is registered, we can reserve 1 seat on that session.
+   #+begin_src bash
+  http -v :8080/movies/reserve screenId=SCN2 imdbId=tt0059742
+   #+end_src
+
+   Let's look session's status.
+   #+begin_src bash
+  http :8080/movies screenId==SCN2 imdbId==tt0059742
+
+  HTTP/1.1 200 OK
+  Server: akka-http/10.0.10
+  Date: Wed, 25 Oct 2017 01:18:33 GMT
+  Content-Type: application/json
+  Content-Length: 111
+
+  {"imdbId":"tt0059742","screenId":"SCN2","movieTitle":"The Sound of Music","availableSeats":1,"reservedSeats":1}
+   #+end_src
+   As expected, available seats should be 1 as with reserved seats.
+
+   Now, what about making request more than the available seats?
+   Fire up registration twice, the second attempt will give us a bad request.
+   #+begin_src bash
+  HTTP/1.1 400 Bad Request
+  Server: akka-http/10.0.10
+  Date: Wed, 25 Oct 2017 01:22:17 GMT
+  Content-Type: text/plain; charset=UTF-8
+  Content-Length: 36
+
+  available seats must not be negative
+   #+end_src
 
 ** Main technology stack
-1. [[https://akka.io/docs/][akka-http]] for both http client and server
-2. [[https://circe.github.io/circe/][circe]] for encoding and decoding Json
-3. [[https://github.com/adamw/macwire][macwire]] for dependency injection
-4. [[http://slick.lightbend.com/][slick]] for accessing database
-5. [[http://www.scala-lang.org/][scala]] for language and standard libraries
-6. [[https://www.docker.com/][docker]] for containerization and server dependencies
-7. [[https://www.mysql.com/][mysql]] for, well, mysql
-8. [[http://wiremock.org/][wiremock]] for mock http server
+   1. [[https://akka.io/docs/][akka-http]] for both http client and server
+   2. [[https://circe.github.io/circe/][circe]] for encoding and decoding Json
+   3. [[https://github.com/adamw/macwire][macwire]] for dependency injection
+   4. [[http://slick.lightbend.com/][slick]] for accessing database
+   5. [[http://www.scala-lang.org/][scala]] for language and standard libraries
+   6. [[https://www.docker.com/][docker]] for containerization and server dependencies
+   7. [[https://www.mysql.com/][mysql]] for, well, mysql
+   8. [[http://wiremock.org/][wiremock]] for mock http server
 
-Unfortunately, no =scalaz= or =cats=, all the monads is implemented using plain, simple and happy scala libraries :)
+   Unfortunately, no [[https://github.com/scalaz/scalaz][scalaz]] or [[https://typelevel.org/cats/][cats]], all the monads is implemented using plain, simple and happy scala libraries :)

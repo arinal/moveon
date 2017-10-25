@@ -5,7 +5,7 @@ import com.lamedh.moveon.core.session.Session
 
 object Models {
 
-  case class RegisterMovie(imdbId: String, availableSeats: Int, screenId: String)
+  case class RegisterMovie(imdbId: String,  screenId: String, availableSeats: Int = 0)
   case class ReserveSeat(imdbId: String, screenId: String)
   case class MovieSession(imdbId: String, screenId: String, movieTitle: String, availableSeats: Int, reservedSeats: Int)
 

@@ -32,7 +32,7 @@ class MovieSlickRepoSpec extends AsyncFlatSpec
       .map(_ shouldEqual Some(fistOfLegend))
   }
 
-  "updating SoM to SoS" should
+  "updating Sound of Music to Sound of Satan" should
   "changed the title" in {
     val changed = soundOfMusic.copy(title = "Sound of Satan")
     movieRepo.update(changed)
@@ -40,7 +40,7 @@ class MovieSlickRepoSpec extends AsyncFlatSpec
       .map(_ shouldEqual Some(changed))
   }
 
-  "inserting SoM again" should
+  "inserting Sound of Music again" should
   "return already exists error" in {
     recoverToSucceededIf[ErrorToken] {
       movieRepo.insert(soundOfMusic)
