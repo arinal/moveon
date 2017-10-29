@@ -17,7 +17,7 @@ object Dependencies {
     "com.typesafe.slick" %% "slick-hikaricp"       % "3.2.1",
     "com.typesafe.akka"  %% "akka-http"            % "10.0.10",
 
-    "com.typesafe.akka" %% "akka-http-testkit" % "10.0.10" % Test,
-    "org.scalatest"     %% "scalatest"         % "3.0.1"   % Test
+    "com.typesafe.akka" %% "akka-http-testkit" % "10.0.10" % "it,test",
+    "org.scalatest"     %% "scalatest"         % "3.0.1"   % "it,test"
   )
 }

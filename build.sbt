@@ -1,16 +1,17 @@
 import Dependencies._
 
 lazy val root = (project in file("."))
+  .configs(IntegrationTest)
   .settings(
-    inThisBuild(List(
-      organization := "com.veon",
+    Seq(
+      organization := "com.example",
       scalaVersion := "2.12.3",
-      version      := "0.1.0"
-    )),
-    name := "moveon",
-    libraryDependencies ++= Dependencies.dependencies)
-  .configs(ItTesting.it: _*)
-  .settings(ItTesting.settings: _*)
+      version      := "0.1.0",
+      name := "moveon",
+      ),
+    Defaults.itSettings,
+    libraryDependencies ++= Dependencies.dependencies
+  )
 
 enablePlugins(DockerPlugin)
 
