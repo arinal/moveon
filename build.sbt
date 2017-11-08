@@ -4,7 +4,7 @@ lazy val root = (project in file("."))
   .configs(IntegrationTest)
   .settings(
     Seq(
-      organization := "com.example",
+      organization := "com.lamedh",
       scalaVersion := "2.12.3",
       version      := "0.1.0",
       name := "moveon",
@@ -27,9 +27,9 @@ dockerfile in docker := {
 }
 
 imageNames in docker := Seq(
-  ImageName(s"veon/${name.value}:latest"),
+  ImageName(s"lamedh/${name.value}:latest"),
   ImageName(
-    namespace = Some("veon"),
+    namespace = Some("lamedh"),
     repository = name.value,
     tag = Some("v" + version.value)
   )

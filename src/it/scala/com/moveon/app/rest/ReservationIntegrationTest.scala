@@ -1,10 +1,10 @@
 package com.lamedh.moveon.app.rest
 
+import org.scalatest.{AsyncFlatSpec, Matchers}
 import akka.actor.ActorSystem
 import akka.stream.{ActorMaterializer, Materializer}
 import com.lamedh.common.akkahttp.AkkaHttpClient
 import com.lamedh.moveon.app.rest.Models.{MovieSession, RegisterMovie, ReserveSeat}
-import org.scalatest.{AsyncFlatSpec, Matchers}
 
 class ReservationIntegrationTest extends AsyncFlatSpec
     with Matchers
